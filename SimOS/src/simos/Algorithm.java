@@ -5,8 +5,8 @@ import util.Queue;
 public class Algorithm {
 	
 	String name;
-	Planner planner;
 	
+	protected Planner planner;
 	protected Queue<Process> processes;
 	
 	public Algorithm() {
