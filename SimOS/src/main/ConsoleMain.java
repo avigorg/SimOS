@@ -14,12 +14,12 @@ public class ConsoleMain {
 		OS os = new OS();
 		
 		Planner planner1 = new Planner();
-		Algorithm alg1 = new Algorithm("fifo");
+		Algorithm alg1 = new Algorithm();
 		planner1.addAlgorithm(alg1);
 		Processor p1 = new Processor("Processor 1", planner1, os);
 		
 		Planner planner2 = new Planner();
-		Algorithm alg2 = new Algorithm("fifo");
+		Algorithm alg2 = new Algorithm();
 		planner2.addAlgorithm(alg2);
 		Processor p2 = new Processor("Processor 2", planner2, os);
 		

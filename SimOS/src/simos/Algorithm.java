@@ -9,6 +9,10 @@ public class Algorithm {
 	Queue<Process> processes;
 	Planner planner;
 	
+	public Algorithm() {
+		this("FIFO");
+	}
+	
 	public Algorithm(String name) {
 		this.name = name;
 		processes = new Queue<>();
