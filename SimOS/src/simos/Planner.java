@@ -39,9 +39,6 @@ public class Planner {
 		
 		Process pr = null;
 		
-		planSuspended();
-		planBlocked();
-		
 		if (current != null){
 			pr = current.algorithm.next(current);
 			
@@ -56,13 +53,19 @@ public class Planner {
 		return pr;
 	}
 	
-	private void planSuspended() {
+	protected void planSuspended() {
 		
 		if (suspended.isEmpty()) {
 			return;
 		}
 		
-		if (suspendedCounter == SUSPENDED_TIME) {
+		boolean empties = true;
+		
+		for (Algorithm a : algorithms) {
+			empties = empties || a.processes.isEmpty();
+		}
+		
+		if (suspendedCounter == SUSPENDED_TIME || empties) {
 			toReady(suspended.get());
 			suspendedCounter = 0;
 		}
@@ -70,7 +73,7 @@ public class Planner {
 		suspendedCounter += 1;
 	}
 	
-	private void planBlocked() {
+	protected void planBlocked() {
 		
 		if (blocked.isEmpty()) {
 			return;

@@ -26,6 +26,9 @@ public class Processor {
 		
 		boolean keep = true;
 		
+		planner.planSuspended();
+		planner.planBlocked();
+		
 		do {
 			
 			current = planner.next(current);
