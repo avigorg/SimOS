@@ -43,7 +43,7 @@ public class Process {
 		state = State.READY;
 		
 		for ( OSEventListener listener : os.listeners ) {
-			listener.onAddProcess(name, algorithm.planner.processor.name, algorithm.name);
+			listener.onAddProcess(this, algorithm.planner.processor, algorithm);
 		}
 	}
 	
@@ -56,7 +56,7 @@ public class Process {
 		}
 		
 		for ( OSEventListener listener : os.listeners ) {
-			listener.onSuspendProcess(name, algorithm.planner.processor.name);
+			listener.onSuspendProcess(this, algorithm.planner.processor);
 		}
 	}
 	
@@ -65,7 +65,7 @@ public class Process {
 		state = State.BLOCKED;
 		
 		for ( OSEventListener listener : os.listeners ) {
-			listener.onBlockProcess(name, algorithm.planner.processor.name);
+			listener.onBlockProcess(this, algorithm.planner.processor);
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class Process {
 		state = State.ENDED;
 
 		for ( OSEventListener listener : os.listeners ) {
-			listener.onEndProcess(name);
+			listener.onEndProcess(this);
 		}
 	}
 	
@@ -88,6 +88,6 @@ public class Process {
 	
 	@Override
 	public String toString() {
-		return name;
+		return  String.format("name: %s time: %d quantum: %d p: %d", name, time, quantum, priority);
 	}
 }

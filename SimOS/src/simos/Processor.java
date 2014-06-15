@@ -62,10 +62,15 @@ public class Processor {
 
 		for(OSEventListener listener : os.listeners) {
 			if (current != null) {
-				listener.onRunProcess(current.name, name);
+				listener.onRunProcess(current, this);
 			} else {
-				listener.onRunProcess("None", name);
+				listener.onRunProcess(null, this);
 			}
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("n: %s pr: %s", name, current);
 	}
 }

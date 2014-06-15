@@ -30,7 +30,7 @@ public class Resource {
 		state = State.FREE;
 		
 		for (OSEventListener listener : os.listeners) {
-			listener.onFreeResource(name);
+			listener.onFreeResource(this);
 		}
 		
 		process = null;
@@ -46,7 +46,7 @@ public class Resource {
 		process = pr;
 		
 		for (OSEventListener listener : os.listeners) {
-			listener.onActiveResource(name, pr.name);
+			listener.onActiveResource(this, pr);
 		}
 	}
 	
@@ -54,7 +54,7 @@ public class Resource {
 		state = State.BLOCKED;
 		
 		for (OSEventListener listener : os.listeners) {
-			listener.onBlockResource(name);
+			listener.onBlockResource(this);
 		}
 		
 		process = null;

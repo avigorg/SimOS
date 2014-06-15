@@ -39,58 +39,61 @@ public class ConsoleMain {
 		p2.addProcess(pr3);
 		
 		OSEventListener console = new OSEventListener() {
-			
+
 			@Override
-			public void onSuspendProcess(String pr, String p) {
-				System.out.println("suspend " + pr);
+			public void onAddProcess(Process pr, Processor p, Algorithm alg) {
+				// TODO Auto-generated method stub
 			}
-			
+
 			@Override
-			public void onRunProcess(String pr, String p) {
-				System.out.println("run " + pr);
+			public void onSuspendProcess(Process pr, Processor p) {
+				// TODO Auto-generated method stub
 				
 			}
-			
+
 			@Override
-			public void onFreeResource(String r) {
+			public void onBlockProcess(Process pr, Processor p) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onEndProcess(Process pr) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onRunProcess(Process pr, Processor p) {
+				System.out.println(p);
+				
+			}
+
+			@Override
+			public void onAddResource(Resource r) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onActiveResource(Resource r, Process pr) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onFreeResource(Resource r) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onBlockResource(Resource r) {
 				// TODO Auto-generated method stub
 				
 			}
 			
-			@Override
-			public void onEndProcess(String pr) {
-				System.out.println("Finish " + pr);
-			}
 			
-			@Override
-			public void onBlockResource(String r) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onBlockProcess(String pr, String p) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onAddResource(String r) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onAddProcess(String pr, String p, String alg) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onActiveResource(String r, String pr) {
-				// TODO Auto-generated method stub
-				
-			}
 		};
 		
 		os.addListener(console);

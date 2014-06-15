@@ -159,7 +159,7 @@ public class OS {
 		resources.put(name, res);
 		
 		for (OSEventListener listener : listeners) {
-			listener.onAddResource(res.name);
+			listener.onAddResource(res);
 		}
 	}
 	
@@ -173,18 +173,17 @@ public class OS {
 	
 	public interface OSEventListener {
 		
-		void onAddProcess(String pr, String p, String alg);
-		void onSuspendProcess(String pr, String p);
-		void onBlockProcess(String pr, String p);
-		void onEndProcess(String pr);
+		void onAddProcess(Process pr, Processor p, Algorithm alg);
+		void onSuspendProcess(Process pr, Processor p);
+		void onBlockProcess(Process pr, Processor p);
+		void onEndProcess(Process pr);
 		
-		void onRunProcess(String pr, String p);
+		void onRunProcess(Process pr, Processor p);
 		
-		void onAddResource(String r);
-		void onActiveResource(String r, String pr);
-		void onFreeResource(String r);
-		void onBlockResource(String r);
-		
+		void onAddResource(Resource r);
+		void onActiveResource(Resource r, Process pr);
+		void onFreeResource(Resource r);
+		void onBlockResource(Resource r);
 	}
 }
 
