@@ -25,7 +25,8 @@ public class Queue <T> {
 	    }
 	}
     
-    Node head;
+    Node head = null;
+    int size = 0;
     
     public void put(T obj) {
         
@@ -45,6 +46,8 @@ public class Queue <T> {
         }
         
         aux.sig = new Node(obj);
+        
+        size += 1;
     }
     
     public T get() {
@@ -56,7 +59,13 @@ public class Queue <T> {
         Node first = head;
         head = head.sig;
         
+        size -= 1;
+        
         return first.value;
+    }
+    
+    public int size() {
+    	return size;
     }
     
     public void remove(T element) {
