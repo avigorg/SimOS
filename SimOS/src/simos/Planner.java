@@ -9,15 +9,14 @@ public class Planner {
 	
 	final int SUSPENDED_TIME = 3;
 	
-	List<Algorithm> algorithms;
-	
 	Queue<Process> suspended;
 	Queue<Process> blocked;
 	Queue<Process> ended;
 	
 	Processor processor;
-	
 	int suspendedCounter;
+	
+	protected List<Algorithm> algorithms;
 	
 	public Planner() {
 		algorithms = new ArrayList<>();

@@ -5,9 +5,9 @@ import util.Queue;
 public class Algorithm {
 	
 	String name;
-	
-	Queue<Process> processes;
 	Planner planner;
+	
+	protected Queue<Process> processes;
 	
 	public Algorithm() {
 		this("FIFO");
