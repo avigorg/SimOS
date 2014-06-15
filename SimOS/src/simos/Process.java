@@ -78,6 +78,10 @@ public class Process {
 		}
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	public int getTime() {
 		return time;
 	}
