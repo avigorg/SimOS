@@ -78,6 +78,14 @@ public class Process {
 		}
 	}
 	
+	public int getTime() {
+		return time;
+	}
+	
+	public void setQuantum(int quantum) {
+		this.quantum = quantum;
+	}
+	
 	@Override
 	public String toString() {
 		return name;
