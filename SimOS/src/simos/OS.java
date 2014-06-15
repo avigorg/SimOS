@@ -12,11 +12,23 @@ public class OS {
 	
 	List<OSEventListener> listeners;
 	
-	public OS() {
+	OSDecider decider;
+	
+	public OS(OSDecider decider) {
 		
 		processors = new ArrayList<>();
 		resources = new HashMap<>();
-		listeners = new LinkedList<>();
+		listeners = new LinkedList<>(); 
+		
+		if (decider != null) { 
+			this.decider = decider;
+		} else {
+			this.decider = new DefaultDecider();
+		}
+	}
+	
+	public OS() {
+		this(null);
 	}
 	
 	public void execute() {
@@ -41,10 +53,6 @@ public class OS {
 		return canRun;
 	}
 	
-	protected boolean hasPriority(Process pr, Process other) {
-		return false;
-	}
-	
 	private boolean canRun(Process pr) {
 		
 		boolean canRun = true;
@@ -57,7 +65,7 @@ public class OS {
 			
 			if (haveCommonRes(pr, p.current)) {
 				
-				if (!hasPriority(pr, p.current)) {	
+				if (!decider.hasPriority(pr, p.current)) {	
 					canRun = false;
 					break;
 				}
@@ -169,6 +177,19 @@ public class OS {
 	
 	public void addListener(OSEventListener listener) {
 		listeners.add(listener);
+	}
+	
+	public interface OSDecider {
+		boolean hasPriority(Process pr, Process other);
+	}
+	
+	class DefaultDecider implements OSDecider {
+
+		@Override
+		public boolean hasPriority(Process pr, Process other) {
+			return pr.priority > other.priority;
+		}
+		
 	}
 	
 	public interface OSEventListener {
