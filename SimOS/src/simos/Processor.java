@@ -31,6 +31,11 @@ public class Processor {
 		
 		do {
 			
+			if (current != null && current.time == 0) {
+				current.end();
+				current = null;
+			}
+			
 			current = planner.next(current);
 			
 			if (current == null) {
@@ -47,6 +52,14 @@ public class Processor {
 	}
 	
 	public void execute() {
+
+		for(OSEventListener listener : os.listeners) {
+			if (current != null) {
+				listener.onRunProcess(current, this);
+			} else {
+				listener.onRunProcess(null, this);
+			}
+		}
 		
 		if (current != null) {
 			
@@ -54,20 +67,6 @@ public class Processor {
 			
 			if (current.quantum != -1) {
 				current.quantum -= 1;
-			}
-			
-			if (current.time == 0) {
-				current.end();
-				current = null;
-			}
-		}
-		
-
-		for(OSEventListener listener : os.listeners) {
-			if (current != null) {
-				listener.onRunProcess(current, this);
-			} else {
-				listener.onRunProcess(null, this);
 			}
 		}
 	}

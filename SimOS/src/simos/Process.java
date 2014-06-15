@@ -94,6 +94,10 @@ public class Process {
 		return quantum;
 	}
 	
+	public int getPriority() {
+		return priority;
+	}
+	
 	@Override
 	public String toString() {
 		return  String.format("name: %s time: %d quantum: %d p: %d", name, time, quantum, priority);
