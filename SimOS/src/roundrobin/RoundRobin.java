@@ -29,6 +29,16 @@ public class RoundRobin extends Algorithm {
 		return next;
 	}
 	
+	@Override
+	protected boolean change(Process pr) {
+		return pr.getQuantum() == 0;
+	}
+	
+	@Override
+	protected void onRun(Process pr) {
+		pr.setQuantum(pr.getQuantum() - 1);
+	}
+	
 	public void calculateQuantums() {
 		
 		Queue<Process> auxQ = new Queue<>();
