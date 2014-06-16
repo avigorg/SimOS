@@ -25,10 +25,10 @@ public class Processor {
 	public void plan() {
 		
 		boolean keep = true;
-		
+				
 		planner.planSuspended();
 		planner.planBlocked();
-		
+
 		do {
 			
 			if (current != null && current.time == 0) {
@@ -36,16 +36,23 @@ public class Processor {
 				current = null;
 			}
 			
-			current = planner.next(current);
+			Process next = planner.next(current);
 			
-			if (current == null) {
+
+			if (next == null || next == current) {
 				keep = false;
 			
-			} else if (!os.tryRun(current)) {
-				current.suspend();
-				current = null;
+			} else if (os.tryRun(next)) {
+				
+				if (current != null) {
+					current.suspend();
+				}
+				
+				current = next;
+				keep = false;
+				
 			} else {
-				keep = false;
+				next.suspend();
 			}
 			
 		} while(keep);

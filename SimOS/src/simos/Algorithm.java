@@ -24,7 +24,7 @@ public class Algorithm {
 	
 	public Process next(Process current) {
 		
-		if(current == null || current.time == 0) {
+		if(current == null) {
 			return processes.get();
 		} 
 		
