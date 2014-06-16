@@ -93,6 +93,7 @@ public class OS {
 			if (haveCommonRes(pr, p.current)) {
 				
 				freeResources(p.current);
+				activeResources(pr);
 				
 				p.current.block();
 				p.current = null;
@@ -122,7 +123,7 @@ public class OS {
 		return result;
 	}
 	
-	private void activeResources(Process pr) {
+	protected void activeResources(Process pr) {
 		
 		for (String res : pr.resources) {
 			Resource r = resources.get(res);
@@ -133,7 +134,7 @@ public class OS {
 		}
 	}
 	
-	private void freeResources(Process pr) {
+	protected void freeResources(Process pr) {
 		
 		for (String res : pr.resources) {
 			Resource r = resources.get(res);

@@ -22,24 +22,31 @@ public class Process {
 	
 	OS os;
 	
-	public Process(String name, int time, String[] resources) {
+	public Process(String name, int time, String[] resources, int  priority, int quantum) {
 		
 		this.name = name;
 		this.time = time;
 		this.state = State.READY;
+		this.priority = priority;
+		this.quantum = quantum;
 		
 		this.resources = new ArrayList<String>();
 		
 		for (String res : resources) {
 			this.resources.add(res);
 		}
-		
-		this.priority = -1;
-		this.quantum = -1;
+	}
+	
+	public Process(String name, int time, String[] resources, int  priority) {
+		this(name, time, resources, priority, -1);
+	}
+	
+	public Process(String name, int time, String[] resources) {
+		this(name, time, resources, -1, -1);
 	}
 	
 	public void ready() {
-		algorithm.addProcess(this);
+		algorithm.addToQueue(this);
 		state = State.READY;
 		
 		for ( OSEventListener listener : os.listeners ) {
@@ -71,6 +78,7 @@ public class Process {
 	
 	public void end() {
 		algorithm.planner.toEnded(this);
+		os.freeResources(this);
 		state = State.ENDED;
 
 		for ( OSEventListener listener : os.listeners ) {

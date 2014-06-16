@@ -1,5 +1,6 @@
 package simos;
 
+import simos.OS.OSEventListener;
 import util.Queue;
 
 public class Algorithm {
@@ -18,8 +19,16 @@ public class Algorithm {
 		processes = new Queue<>();
 	}
 	
-	public void addProcess(Process pr) {
+	protected void addToQueue(Process pr) {
 		processes.put(pr);
+	}
+	
+	public void addProcess(Process pr) {
+		addToQueue(pr);
+		
+		for (OSEventListener listener : planner.processor.os.listeners) {
+			listener.onAddProcess(pr, planner.processor, this);
+		}
 	}
 	
 	public Process next(Process current) {
@@ -29,5 +38,14 @@ public class Algorithm {
 		} 
 		
 		return current;
+	}
+	
+	public boolean isEmpty() {
+		return processes.isEmpty();
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }

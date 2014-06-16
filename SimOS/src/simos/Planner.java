@@ -3,6 +3,7 @@ package simos;
 import java.util.ArrayList;
 import java.util.List;
 
+import simos.OS.OSEventListener;
 import util.Queue;
 
 public class Planner {
@@ -31,26 +32,34 @@ public class Planner {
 		algorithms.add(alg);
 	}
 	
-	public Algorithm getPreferredAlgorithm() {
+	public Algorithm getNextAlgorithm() {
 		return algorithms.get(0);
 	}
 	
 	public Process next(Process current) {
 		
 		Process pr = null;
-		
-		if (current != null){
-			pr = current.algorithm.next(current);
+		Algorithm alg = getNextAlgorithm();
 			
-		} else {
-			Algorithm alg = getPreferredAlgorithm();
-			
-			if (alg != null) {
-				pr = alg.next(null);
-			}
+		if (alg != null) {
+			pr = alg.next(current);
 		}
 		
 		return pr;
+	}
+	
+	protected Algorithm getPreferredAlgorithm(Process pr) {
+		return algorithms.get(0);
+	}
+	
+	protected void addProcess(Process pr){
+		
+		Algorithm alg = getPreferredAlgorithm(pr);
+		
+		if (alg != null) {
+			alg.addProcess(pr);
+			pr.algorithm = alg;
+		}
 	}
 	
 	protected void planSuspended() {
@@ -101,13 +110,7 @@ public class Planner {
 			pr.ready();
 			
 		} else {
-			
-			Algorithm alg = getPreferredAlgorithm();
-			
-			if (alg != null) {
-				pr.algorithm = alg;
-				pr.ready();
-			}
+			addProcess(pr);
 		}
 	}
 	
