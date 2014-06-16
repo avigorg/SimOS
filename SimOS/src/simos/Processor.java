@@ -26,20 +26,26 @@ public class Processor {
 		
 		boolean keep = true;
 				
-		planner.planSuspended();
-		planner.planBlocked();
+		planner.plan();
 
 		do {
 			
-			if (current != null && current.time == 0) {
-				current.end();
-				current = null;
+			if (current != null) {
+				if (current.time == 0) {
+					current.end();
+					current = null;
+				
+				} else if (current.change()) {
+					
+					current.suspend();
+					current = null;
+				}
 			}
 			
 			Process next = planner.next(current);
 			
 
-			if (next == null || next == current) {
+			if (next == null || next == current) {				
 				keep = false;
 			
 			} else if (os.tryRun(next)) {
@@ -70,11 +76,8 @@ public class Processor {
 		
 		if (current != null) {
 			
-			current.time -= 1;
-			
-			if (current.quantum != -1) {
-				current.quantum -= 1;
-			}
+			current.time -= 1;			
+			current.onRun();
 		}
 	}
 	

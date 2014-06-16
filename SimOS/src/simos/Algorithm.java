@@ -19,6 +19,27 @@ public class Algorithm {
 		processes = new Queue<>();
 	}
 	
+	protected void plan() {
+		Queue<Process> auxQ = new Queue<>();
+		
+		while (!processes.isEmpty()) {
+			Process pr = processes.get();
+			pr.waiting += 1;
+			
+			auxQ.put(pr);
+		} 
+		
+		processes.joinBefore(auxQ);
+	}
+	
+	protected void onRun(Process pr) {
+		return;
+	}
+	
+	protected boolean change(Process pr) {
+		return false;
+	}
+	
 	protected void addToQueue(Process pr) {
 		processes.put(pr);
 	}
@@ -42,6 +63,10 @@ public class Algorithm {
 	
 	public boolean isEmpty() {
 		return processes.isEmpty();
+	}
+	
+	public Queue<Process> getProcesses() {
+		return processes;
 	}
 	
 	@Override

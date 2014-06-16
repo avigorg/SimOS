@@ -62,6 +62,16 @@ public class Planner {
 		}
 	}
 	
+	protected void plan() {
+		
+		for (Algorithm a : algorithms) {
+			a.plan();
+		}
+		
+		planSuspended();
+		planBlocked();
+	}
+	
 	protected void planSuspended() {
 		
 		if (suspended.isEmpty()) {

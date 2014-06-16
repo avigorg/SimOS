@@ -15,6 +15,8 @@ public class Process {
 	int quantum;
 	int priority;
 	
+	int waiting;
+	
 	State state;
 	Algorithm algorithm;
 	
@@ -29,6 +31,7 @@ public class Process {
 		this.state = State.READY;
 		this.priority = priority;
 		this.quantum = quantum;
+		this.waiting = 0; 
 		
 		this.resources = new ArrayList<String>();
 		
@@ -43,6 +46,14 @@ public class Process {
 	
 	public Process(String name, int time, String[] resources) {
 		this(name, time, resources, -1, -1);
+	}
+	
+	protected boolean change() {
+		return algorithm.change(this);
+	}
+	
+	protected void onRun() {
+		algorithm.onRun(this);
 	}
 	
 	public void ready() {
@@ -94,12 +105,24 @@ public class Process {
 		return time;
 	}
 	
+	public void resetWaiting() {
+		waiting = 0;
+	}
+	
+	public int getWaiting() {
+		return waiting;
+	}
+	
 	public void setQuantum(int quantum) {
 		this.quantum = quantum;
 	}
 	
 	public int getQuantum() {
 		return quantum;
+	}
+	
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 	
 	public int getPriority() {
