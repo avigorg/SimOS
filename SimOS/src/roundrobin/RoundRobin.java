@@ -12,23 +12,21 @@ public class RoundRobin extends Algorithm {
 	}
 	
 	@Override
-	public void addProcess(Process pr) {
-		super.addProcess(pr);
+	public void addToQueue(Process pr) {
+		super.addToQueue(pr);
 		calculateQuantums();
 	}
 	
 	@Override
 	public Process next(Process current) {
 		
-		if (current == null) {
-			return processes.get();
+		Process next = current;
 		
-		} else if (current.getQuantum() == 0) {
-			current.suspend();
-			return processes.get();
-		}
+		if (current == null || current.getQuantum() == 0) {
+			next = processes.get();
+		} 
 		
-		return current;
+		return next;
 	}
 	
 	public void calculateQuantums() {

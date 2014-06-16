@@ -13,11 +13,12 @@ public class SRJFAlgorithm extends Algorithm {
 	}
 	
 	public SRJFAlgorithm(boolean preemptive) {
+		super("SRJF");
 		this.preemptive = preemptive;
 	}
 	
 	@Override
-	public void addProcess(Process newP) {
+	public void addToQueue(Process newP) {
 		
 		Queue<Process> auxQ = new Queue<>();
 		
@@ -59,7 +60,7 @@ public class SRJFAlgorithm extends Algorithm {
 				next = first;
 			
 			} else {
-				addProcess(first);
+				addToQueue(first);
 			} 
 		}
 		
