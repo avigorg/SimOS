@@ -44,7 +44,6 @@ public class Processor {
 			
 			Process next = planner.next(current);
 			
-
 			if (next == null || next == current) {				
 				keep = false;
 			

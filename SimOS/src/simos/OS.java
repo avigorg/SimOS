@@ -95,10 +95,7 @@ public class OS {
 				continue;
 			}
 			
-			if (haveCommonRes(pr, p.current)) {
-				
-				freeResources(p.current);
-				
+			if (haveCommonRes(pr, p.current)) {				
 				p.current.block();
 				p.current = null;
 				

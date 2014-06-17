@@ -46,6 +46,7 @@ public class Algorithm {
 	
 	public void addProcess(Process pr) {
 		addToQueue(pr);
+		pr.waiting = 0;
 		
 		for (OSEventListener listener : planner.processor.os.listeners) {
 			listener.onAddProcess(pr, planner.processor, this);

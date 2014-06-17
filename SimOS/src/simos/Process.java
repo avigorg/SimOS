@@ -48,13 +48,14 @@ public class Process {
 		this(name, time, resources, -1, -1);
 	}
 	
-	protected boolean change() {
+	public boolean change() {
 		return algorithm.change(this);
 	}
 	
 	public void run() {
 		
 		time -= 1;
+		waiting = 0;
 		state = State.RUNNING;
 		algorithm.onRun(this);
 	}
@@ -70,6 +71,7 @@ public class Process {
 	
 	public void suspend() {
 		algorithm.planner.toSuspended(this);
+		os.freeResources(this);
 		state = State.SUSPENDED;
 		
 		for ( OSEventListener listener : os.listeners ) {
@@ -79,6 +81,7 @@ public class Process {
 	
 	public void block() {
 		algorithm.planner.toBlocked(this);
+		os.freeResources(this);
 		state = State.BLOCKED;
 		
 		for ( OSEventListener listener : os.listeners ) {

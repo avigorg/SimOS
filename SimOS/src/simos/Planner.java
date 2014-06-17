@@ -32,19 +32,21 @@ public class Planner {
 		algorithms.add(alg);
 	}
 	
-	public Algorithm getNextAlgorithm() {
+	public Algorithm getNextAlgorithm(Process current) {
 		return algorithms.get(0);
 	}
 	
 	public Process next(Process current) {
 		
 		Process pr = null;
-		Algorithm alg = getNextAlgorithm();
-			
-		if (alg != null) {
+		Algorithm alg = getNextAlgorithm(current);
+		
+		if (current != null && alg != current.algorithm && !(current.time == 0 || current.change())) {
+			pr = alg.next(null);
+		} else {
 			pr = alg.next(current);
 		}
-		
+
 		return pr;
 	}
 	
