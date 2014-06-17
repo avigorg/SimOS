@@ -34,6 +34,7 @@ public class OS {
 	public void execute() {
 		
 		for (Processor p : processors) {
+			p.planner.plan();
 			p.plan();
 		}
 		
@@ -44,7 +45,9 @@ public class OS {
 	
 	public boolean tryRun(Process pr) {
 		
-		boolean canRun = canRun(pr);
+		System.out.println("try " + pr.name);
+		
+		boolean canRun = verifyResources(pr);
 		
 		if(canRun) {			
 			run(pr);
@@ -53,9 +56,44 @@ public class OS {
 		return canRun;
 	}
 	
-	private boolean canRun(Process pr) {
+	private void run(Process pr) {
 		
-		boolean canRun = true;
+		Process aux = pr.algorithm.planner.processor.current;
+		pr.algorithm.planner.processor.current = pr;
+		
+		for (Processor p : processors) {
+			
+			if (p.current == pr || p.current == null || p.current.time == 0 || p.current.change()) {
+				continue;
+			}
+			
+			if (haveCommonRes(pr, p.current)) {				
+				p.current.lock();
+				p.current = null;
+				
+				System.out.println("plan extra for " + p.name);
+				p.plan();
+			}
+		}
+		
+		pr.algorithm.planner.processor.current = aux;
+		activeResources(pr);
+	}
+	
+	public boolean verifyResources(Process pr) {
+		
+		boolean available = true;
+		
+		for (String res : pr.resources) {
+			if (!resources.containsKey(res) || resources.get(res).isLocked()) {
+				available = false;
+				break;
+			}
+		}
+		
+		if (!available) {
+			return false;
+		}
 		
 		for (Processor p : processors) {
 			
@@ -65,72 +103,18 @@ public class OS {
 			
 			if (haveCommonRes(pr, p.current)) {				
 				if (!decider.hasPriority(pr, p.current)) {	
-					canRun = false;
+					System.out.println("no lo logro: " + pr.name);
+					available = false;
 					break;
+				} else {
+					System.out.println("si lo logro: " + pr.name);
 				}
+			} else {
+				System.out.println("nope commons");
 			}
 		}
 		
-		for (String res : pr.resources) {
-			if (!resources.containsKey(res)){
-				canRun = false;
-				break;
-			}
-		}
-		
-		return canRun;
-	}
-	
-	private void run(Process pr) {
-		
-		activeResources(pr);
-		
-		if (pr.algorithm.planner.processor.current == null) {
-			pr.algorithm.planner.processor.current = pr;
-		}
-		
-		for (Processor p : processors) {
-			
-			if (p.current == pr || p.current == null || p.current.time == 0 || p.current.change()) {
-				continue;
-			}
-			
-			if (haveCommonRes(pr, p.current)) {				
-				p.current.block();
-				p.current = null;
-				
-				p.plan();
-			}
-		}
-	}
-	
-	public boolean verifyResources(Process pr) {
-		
-		boolean result = true;
-		
-		for (Processor p : processors) {
-			
-			if (p.current == pr || p.current == null || p.current.time == 0 || p.current.change()) {
-				continue;
-			
-			} else if (haveCommonRes(pr, p.current)) {
-				result = false;
-				break;
-			}
-		}
-		
-//		for (String res : pr.resources) {
-//			
-//			if (!resources.containsKey(res)) {
-//				result = false;
-//				break;
-//			} else if (!resources.get(res).isFree()) {
-//				result = false;
-//				break;
-//			}
-//		}
-//		
-		return result;
+		return available;
 	}
 	
 	protected void activeResources(Process pr) {
@@ -161,7 +145,14 @@ public class OS {
 		boolean common = false;
 		
 		for (String res : pr.resources) {
+			
+			System.out.println(pr.name + " "+res);
+			System.out.println(other.name);
+			
 			if (other.resources.contains(res)) {
+				
+				System.out.println("common " + res + " " + pr.name + " " + other.name);
+				
 				common = true;
 				break;
 			}

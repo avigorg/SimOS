@@ -4,7 +4,7 @@ import simos.OS.OSEventListener;
 
 public class Resource {
 	
-	public enum State{ FREE, BUSY, BLOCKED };
+	public enum State{ FREE, BUSY, LOCKED };
 	
 	String name;
 	State state;
@@ -21,9 +21,13 @@ public class Resource {
 		return state == State.FREE;
 	}
 	
+	public boolean isLocked() {
+		return state == State.LOCKED;
+	}
+	
 	public void free() {
 		
-		if (state == State.BLOCKED) {
+		if (state == State.LOCKED) {
 			return;
 		}
 		
@@ -38,7 +42,7 @@ public class Resource {
 	
 	public void active(Process pr) {
 		
-		if (state == State.BLOCKED) {
+		if (state == State.LOCKED) {
 			return;
 		}
 		
@@ -51,7 +55,7 @@ public class Resource {
 	}
 	
 	public void block() {
-		state = State.BLOCKED;
+		state = State.LOCKED;
 		
 		for (OSEventListener listener : os.listeners) {
 			listener.onBlockResource(this);

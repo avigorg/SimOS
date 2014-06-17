@@ -7,7 +7,7 @@ import simos.OS.OSEventListener;
 
 public class Process {
 
-	public enum State {RUNNING, READY, SUSPENDED, BLOCKED, ENDED};
+	public enum State {RUNNING, READY, SUSPENDED, LOCKED, ENDED};
 	
 	String name;
 	
@@ -79,10 +79,10 @@ public class Process {
 		}
 	}
 	
-	public void block() {
-		algorithm.planner.toBlocked(this);
+	public void lock() {
+		algorithm.planner.toLocked(this);
 		os.freeResources(this);
-		state = State.BLOCKED;
+		state = State.LOCKED;
 		
 		for ( OSEventListener listener : os.listeners ) {
 			listener.onBlockProcess(this, algorithm.planner.processor);

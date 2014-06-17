@@ -130,7 +130,7 @@ public class Planner {
 		suspended.put(pr);
 	}
 	
-	public void toBlocked(Process pr) {
+	public void toLocked(Process pr) {
 		blocked.put(pr);
 	}
 	

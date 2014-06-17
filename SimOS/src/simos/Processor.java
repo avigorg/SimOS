@@ -25,8 +25,6 @@ public class Processor {
 	public void plan() {
 		
 		boolean keep = true;
-				
-		planner.plan();
 
 		do {
 			
@@ -44,12 +42,15 @@ public class Processor {
 			
 			Process next = planner.next(current);
 			
+			if (next != null)
+				System.out.println("next: " + next.name);
+			
 			if (next == null || next == current) {				
 				keep = false;
 			
 			} else if (os.tryRun(next)) {
 				
-				if (current != next) {
+				if (current != next && current != null) {
 					current.suspend();
 				}
 				
