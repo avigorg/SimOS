@@ -69,28 +69,30 @@ public class MultiLevel extends Planner {
 		
 		if (pr.getPriority() > 0 && pr.getPriority() <= algorithms.size()) {
 			alg = algorithms.get(pr.getPriority()-1);
-			System.out.println("hello");
 		}
 		
 		return alg;
 	}
 	
 	@Override
-	public Algorithm getNextAlgorithm() {
-		
-		Algorithm next = currentAlgorithm;
+	public Algorithm getNextAlgorithm(Process current) {
 		
 		if (preemptive || currentAlgorithm == null || currentAlgorithm.isEmpty()) {
 			
 			for (Algorithm a : algorithms) {
-				if (!a.isEmpty()) {
-					next = a;
+				
+				if (a == currentAlgorithm && current != null && current.getTime() > 0 && !current.change()) {
+					break;
+				}
+				
+				if (!a.isEmpty() ) {
+					currentAlgorithm = a;
 					break;
 				}
 			}
 		}
 		
-		return next;
+		return currentAlgorithm;
 	}
 	
 	@Override

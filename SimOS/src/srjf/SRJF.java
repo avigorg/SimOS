@@ -4,15 +4,15 @@ import simos.Algorithm;
 import simos.Process;
 import util.Queue;
 
-public class SRJFAlgorithm extends Algorithm {
+public class SRJF extends Algorithm {
 
 	boolean preemptive;
 	
-	public SRJFAlgorithm() {
+	public SRJF() {
 		this(false);
 	}
 	
-	public SRJFAlgorithm(boolean preemptive) {
+	public SRJF(boolean preemptive) {
 		super("SRJF");
 		this.preemptive = preemptive;
 	}
@@ -21,25 +21,21 @@ public class SRJFAlgorithm extends Algorithm {
 	public void addToQueue(Process newP) {
 		
 		Queue<Process> auxQ = new Queue<>();
+		boolean added = false;
 		
-		Process oldP = null;
-		boolean keep = true;
-		
-		while (!processes.isEmpty() && keep) {
-			
-			oldP = processes.get();
+		while(!processes.isEmpty() && !added) {
+			Process oldP = processes.get();
 			
 			if (newP.getTime() < oldP.getTime()) {
-				keep = false;
-			} else {
-				auxQ.put(oldP);
+				auxQ.put(newP);
+				added = true;
 			}
+			
+			auxQ.put(oldP);
 		}
 		
-		auxQ.put(newP);
-		
-		if (oldP != null) {
-			auxQ.put(oldP);
+		if (!added) {
+			auxQ.put(newP);
 		}
 		
 		processes.joinBefore(auxQ);
