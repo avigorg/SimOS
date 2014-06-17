@@ -7,7 +7,7 @@ import simos.OS.OSEventListener;
 
 public class Process {
 
-	public enum State {READY, SUSPENDED, BLOCKED, ENDED};
+	public enum State {RUNNING, READY, SUSPENDED, BLOCKED, ENDED};
 	
 	String name;
 	
@@ -52,7 +52,10 @@ public class Process {
 		return algorithm.change(this);
 	}
 	
-	protected void onRun() {
+	public void run() {
+		
+		time -= 1;
+		state = State.RUNNING;
 		algorithm.onRun(this);
 	}
 	
@@ -68,10 +71,6 @@ public class Process {
 	public void suspend() {
 		algorithm.planner.toSuspended(this);
 		state = State.SUSPENDED;
-
-		if (algorithm.planner.processor == null) {
-			System.out.println("ta raro");
-		}
 		
 		for ( OSEventListener listener : os.listeners ) {
 			listener.onSuspendProcess(this, algorithm.planner.processor);

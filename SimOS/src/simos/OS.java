@@ -59,12 +59,11 @@ public class OS {
 		
 		for (Processor p : processors) {
 			
-			if (p.current == pr || p.current == null) {
+			if (p.current == pr || p.current == null || p.current.time == 0 || p.current.change()) {
 				continue;
 			}
 			
-			if (haveCommonRes(pr, p.current)) {
-				
+			if (haveCommonRes(pr, p.current)) {				
 				if (!decider.hasPriority(pr, p.current)) {	
 					canRun = false;
 					break;
@@ -84,16 +83,21 @@ public class OS {
 	
 	private void run(Process pr) {
 		
+		activeResources(pr);
+		
+		if (pr.algorithm.planner.processor.current == null) {
+			pr.algorithm.planner.processor.current = pr;
+		}
+		
 		for (Processor p : processors) {
 			
-			if (p.current == pr || p.current == null) {
+			if (p.current == pr || p.current == null || p.current.time == 0 || p.current.change()) {
 				continue;
 			}
 			
 			if (haveCommonRes(pr, p.current)) {
 				
 				freeResources(p.current);
-				activeResources(pr);
 				
 				p.current.block();
 				p.current = null;
@@ -101,25 +105,34 @@ public class OS {
 				p.plan();
 			}
 		}
-		
-		activeResources(pr);
-		
 	}
 	
 	public boolean verifyResources(Process pr) {
 		
 		boolean result = true;
 		
-		for (String res : pr.resources) {
-			if (!resources.containsKey(res)) {
-				result = false;
-				break;
-			} else if (!resources.get(res).isFree()) {
+		for (Processor p : processors) {
+			
+			if (p.current == pr || p.current == null || p.current.time == 0 || p.current.change()) {
+				continue;
+			
+			} else if (haveCommonRes(pr, p.current)) {
 				result = false;
 				break;
 			}
 		}
 		
+//		for (String res : pr.resources) {
+//			
+//			if (!resources.containsKey(res)) {
+//				result = false;
+//				break;
+//			} else if (!resources.get(res).isFree()) {
+//				result = false;
+//				break;
+//			}
+//		}
+//		
 		return result;
 	}
 	
@@ -139,7 +152,7 @@ public class OS {
 		for (String res : pr.resources) {
 			Resource r = resources.get(res);
 			
-			if (r != null) {
+			if (r != null && r.process == pr) {
 				r.free();
 			}
 		}
@@ -188,7 +201,7 @@ public class OS {
 
 		@Override
 		public boolean hasPriority(Process pr, Process other) {
-			return pr.priority > other.priority;
+			return pr.priority < other.priority;
 		}
 		
 	}

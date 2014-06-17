@@ -50,7 +50,7 @@ public class Processor {
 			
 			} else if (os.tryRun(next)) {
 				
-				if (current != null) {
+				if (current != next) {
 					current.suspend();
 				}
 				
@@ -75,9 +75,7 @@ public class Processor {
 		}
 		
 		if (current != null) {
-			
-			current.time -= 1;			
-			current.onRun();
+			current.run();
 		}
 	}
 	
