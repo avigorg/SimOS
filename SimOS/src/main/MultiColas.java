@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -49,6 +50,8 @@ import util.Queue;
 public class MultiColas extends JFrame {
     OS os;
     List<PanelProcesador> procesadores;
+    
+    boolean running;
     
     public MultiColas(int cantidad) {
         super("MultiColas");
@@ -97,31 +100,33 @@ public class MultiColas extends JFrame {
     	JMenuItem crearRecurso = new JMenuItem("Crear");
     	JMenuItem mostrarGantt = new JMenuItem("Mostrar");
     	
+    	final MultiColas gui = this;
+    	
     	iniciar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
+				running = true;
 			}
 		});
     	
     	pausar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
+				running = false;
 			}
 		});
     	
     	crearProceso.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new DialogoProceso();
+				new DialogoProceso(gui);
 			}
 		});
     	
     	crearRecurso.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new DialogoRecurso();
+				new DialogoRecurso(gui);
 			}
 		});
     	
@@ -211,8 +216,10 @@ public class MultiColas extends JFrame {
             @Override
             public void run() {
                 while (true) {
-                    actualizar();
-                    os.execute();
+                	if (running) {
+                		actualizar();
+                    	os.execute();
+                	}
                     
                     try {
                         Thread.sleep(2000);
@@ -232,6 +239,8 @@ public class MultiColas extends JFrame {
     
     public void addProceso(Process p, int indice) {
         os.getProcessors().get(indice-1).addProcess(p);
+        
+        System.out.println("proceso agregado");
     }
     
     public void addRecurso(String res) {
@@ -243,6 +252,8 @@ public class MultiColas extends JFrame {
         
         gui.addRecurso("Screen");
         gui.addRecurso("Printer");
+        gui.addRecurso("Keyboard");
+        gui.addRecurso("Mouse");
         
         /* allocate processes for processor one */
         gui.addProceso(new Process("process1", 5, new String[]{"Printer"}, 1), 1);
@@ -260,6 +271,7 @@ public class MultiColas extends JFrame {
 
         gui.addProceso(new Process("process8", 2, new String[]{"Screen"}, 3), 2);
         
+        gui.actualizar();
         gui.lanzar();
     }
     
@@ -280,8 +292,8 @@ class PanelProcesador extends JPanel {
         
         algoritmos = new LinkedList<>();
         
-        proceso = new JLabel("---");
-        recursos = new JLabel("---");
+        proceso = new JLabel("-----", JLabel.CENTER);
+        recursos = new JLabel("-----", JLabel.CENTER);
         
         JPanel datos = new JPanel(new GridLayout(2, 1));
         datos.add(proceso);
@@ -309,14 +321,14 @@ class PanelProcesador extends JPanel {
         Process current = procesador.getCurrent();
         
         if (current != null) {
-            proceso.setText(String.format("     N: %s       T: %s        Q: %s        P: %s", 
+            proceso.setText(String.format("N: %s       T: %s        Q: %s        P: %s", 
                     current.getName(), current.getTime(), current.getQuantum(), current.getPriority() ));
             
-            recursos.setText("     "+GUtil.stringResources(current));
+            recursos.setText(GUtil.stringResources(current));
             
         } else {
-            proceso.setText("     -----");
-            recursos.setText("     -----");
+            proceso.setText("-----");
+            recursos.setText("-----");
         }
         
         for (ListaAlgoritmo a : algoritmos) {
@@ -426,7 +438,12 @@ class PanelCola extends JPanel {
 
 abstract class Dialogo extends JFrame {
 	
-	public Dialogo() {
+	MultiColas gui;
+	
+	public Dialogo(String titulo, MultiColas gui) {
+		super(titulo);
+		this.gui = gui;
+		
 		setPreferredSize(build());
 		
 		pack();
@@ -444,40 +461,86 @@ class DialogoProceso extends Dialogo {
 	JTextField tiempo;
 	JTextField prioridad;
 	JList<String> recursos;
+	JComboBox<String> procesador;
+	
+	public DialogoProceso(MultiColas gui) {
+		super("Crear Proceso", gui);
+	}
 	
 	protected Dimension build() {
 		nombre = new JTextField();
 		tiempo = new JTextField();
 		prioridad = new JTextField();
 		recursos = new JList<>();
+		procesador = new JComboBox<>();
 		
+		for (Processor p : gui.os.getProcessors()) {
+			procesador.addItem(p.getName());
+		}
+		procesador.setSelectedIndex(0);
 		
-		setLayout(new GridLayout(5, 2));
+		setLayout(new GridLayout(1, 3));
 		
-		add(new Label("Nombre"));
-		add(nombre);
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(4, 2));
 		
-		add(new Label("Tiempo"));
-		add(tiempo);
+		panel.add(new Label("Nombre"));
+		panel.add(nombre);
 		
-		add(new Label("Prioridad"));
-		add(prioridad);
+		panel.add(new Label("Tiempo"));
+		panel.add(tiempo);
 		
-		add(new Label("Recursos"));
-		add(new JScrollPane(recursos));
+		panel.add(new Label("Prioridad"));
+		panel.add(prioridad);
+		
+		panel.add(new Label("Procesador"));
+		panel.add(procesador);
+		
+		add(panel);
+		
+		/* Create resource list */
+		DefaultListModel<String> modelo = new DefaultListModel<>();
+		recursos.setModel(modelo);
+		
+		for (String res : gui.os.getResources().keySet()) {
+			modelo.addElement(res);
+		}
+		
+		JPanel panelRes = new JPanel(new GridLayout(2, 1));
+		
+		panelRes.add(new Label("Recursos"));
+		panelRes.add(new JScrollPane(recursos));
+		
+		add(panelRes);
 		
 		JButton crear = new JButton("Crear");
+		crear.setPreferredSize(new Dimension(20,20));
 		crear.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				
+				List<String> listado = recursos.getSelectedValuesList();
+				String[] recursos = new String[listado.size()]; 
+				
+				for (int i=0; i<recursos.length; i++) {
+					recursos[i] = listado.get(i);
+					System.out.println(recursos[i]);
+				}
+				
+				gui.addProceso(new Process(nombre.getText(), 
+								Integer.parseInt(tiempo.getText()), 
+								recursos, 
+								Integer.parseInt(prioridad.getText())), 
+							procesador.getSelectedIndex()+1);
+				
+				gui.actualizar();
+				dispose();
 			}
 		});
-		
-		add(new JLabel());
+
 		add(crear);
 		
-		return new Dimension(500, 150);
+		return new Dimension(700, 150);
 	}	
 }
 
@@ -485,6 +548,10 @@ class DialogoRecurso extends Dialogo {
 
 	JTextField nombre;
 
+	public DialogoRecurso(MultiColas gui) {
+		super("Crear Recurso", gui);
+	}
+	
 	@Override
 	protected Dimension build() {
 		nombre = new JTextField();
@@ -498,7 +565,9 @@ class DialogoRecurso extends Dialogo {
 		crear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
+				gui.addRecurso(nombre.getText());
+				gui.actualizar();
+				dispose();
 			}
 		});
 		

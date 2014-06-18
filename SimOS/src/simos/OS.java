@@ -186,6 +186,10 @@ public class OS {
 		return processors;
 	}
 	
+	public HashMap<String, Resource> getResources() {
+		return resources;
+	}
+	
 	public interface OSDecider {
 		boolean hasPriority(Process pr, Process other);
 	}
