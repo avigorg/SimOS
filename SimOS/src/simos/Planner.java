@@ -11,7 +11,7 @@ public class Planner {
 	final int SUSPENDED_TIME = 3;
 	
 	Queue<Process> suspended;
-	Queue<Process> blocked;
+	Queue<Process> locked;
 	Queue<Process> ended;
 	
 	Processor processor;
@@ -23,7 +23,7 @@ public class Planner {
 		algorithms = new ArrayList<>();
 		
 		suspended = new Queue<>();
-		blocked = new Queue<>();
+		locked = new Queue<>();
 		ended = new Queue<>();
 	}
 	
@@ -96,15 +96,15 @@ public class Planner {
 	
 	protected void planBlocked() {
 		
-		if (blocked.isEmpty()) {
+		if (locked.isEmpty()) {
 			return;
 		}
 		
 		Queue<Process> auxQueue = new Queue<>();
 		
-		while(!blocked.isEmpty()) {
+		while(!locked.isEmpty()) {
 			
-			Process pr = blocked.get();
+			Process pr = locked.get();
 			
 			if (processor.os.verifyResources(pr)) {
 				toReady(pr);
@@ -113,7 +113,7 @@ public class Planner {
 			}
 		}
 		
-		blocked.joinBefore(auxQueue);
+		locked.joinBefore(auxQueue);
 	}
 	
 	public void toReady(Process pr) {
@@ -131,11 +131,23 @@ public class Planner {
 	}
 	
 	public void toLocked(Process pr) {
-		blocked.put(pr);
+		locked.put(pr);
 	}
 	
 	public void toEnded(Process pr) {
 		ended.put(pr);
+	}
+	
+	public Queue<Process> getSuspended() {
+		return suspended;
+	}
+	
+	public Queue<Process> getLocked() {
+		return locked;
+	}
+	
+	public List<Algorithm> getAlgorithms() {
+		return algorithms;
 	}
 	
 }

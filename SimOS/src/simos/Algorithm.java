@@ -66,6 +66,10 @@ public class Algorithm {
 		return processes.isEmpty();
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	public Queue<Process> getProcesses() {
 		return processes;
 	}

@@ -175,10 +175,15 @@ public class OS {
 	
 	public void addProcessor(Processor p) {
 		processors.add(p);
+		p.os = this;
 	}
 	
 	public void addListener(OSEventListener listener) {
 		listeners.add(listener);
+	}
+	
+	public List<Processor> getProcessors() {
+		return processors;
 	}
 	
 	public interface OSDecider {

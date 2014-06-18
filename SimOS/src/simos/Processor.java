@@ -9,10 +9,9 @@ public class Processor {
 	Planner planner;
 	OS os;
 	
-	public Processor(String name, Planner planner, OS os) {
+	public Processor(String name, Planner planner) {
 		this.name = name;
 		this.planner = planner;
-		this.os = os;
 		
 		this.planner.processor = this;
 	}
@@ -81,6 +80,14 @@ public class Processor {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public Planner getPlanner() {
+		return planner;
+	}
+	
+	public Process getCurrent() {
+		return current;
 	}
 	
 	@Override

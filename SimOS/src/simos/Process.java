@@ -131,6 +131,10 @@ public class Process {
 		return priority;
 	}
 	
+	public List<String> getResources() {
+		return resources;
+	}
+	
 	@Override
 	public String toString() {
 		return  String.format("name: %s time: %d quantum: %d p: %d", name, time, quantum, priority);
