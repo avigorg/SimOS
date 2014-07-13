@@ -14,6 +14,7 @@ import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,7 +30,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 import multilevel.MultiLevel;
 import roundrobin.RoundRobin;
@@ -48,8 +53,11 @@ import util.Queue;
  * @author jefferson
  */
 public class MultiColas extends JFrame {
+	
     OS os;
     List<PanelProcesador> procesadores;
+    DiagramaGantt gantt;
+    OSInfo info;
     
     boolean running;
     
@@ -58,12 +66,20 @@ public class MultiColas extends JFrame {
         
         os = new OS();
         procesadores = new LinkedList<>();
+        gantt = new DiagramaGantt(os.getProcesses());
+        info = new OSInfo(os);
         crearBarraMenu();
         
-        JPanel panel = new JPanel(new GridLayout(1, cantidad));
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridy = 0;
+        c.weighty = 1;
+        c.fill = c.BOTH;
+        
+        JPanel panelLogica = new JPanel(new GridLayout(1, cantidad));
         
         for (int i=0; i<cantidad; i++) {
-            Planner pl = new MultiLevel();
+            Planner pl = new MultiLevel(false, true);
             Processor p = new Processor("Processor"+(i+1), pl);
             
             pl.addAlgorithm(new RoundRobin());
@@ -74,16 +90,25 @@ public class MultiColas extends JFrame {
             
             PanelProcesador pPanel = new PanelProcesador(p);
             procesadores.add(pPanel);
-            panel.add(pPanel);
-        }
+            panelLogica.add(pPanel);
+        }        
+        panelLogica.revalidate();
+
+        JScrollPane scroll = new JScrollPane(panelLogica);
         
-        add(panel);
+        c.gridx = 0;
+        c.weightx = 0.8;
+        add(scroll, c);
+        
+        c.gridx = 3;
+        c.weightx = 0.2;
+        add(info, c);
         
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(350 * cantidad, 600);
         setVisible(true);
         
-        crearLogger();
+        crearListener();
     }
     
     private void crearBarraMenu() {
@@ -133,7 +158,7 @@ public class MultiColas extends JFrame {
     	mostrarGantt.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
+				gui.gantt.setVisible(true);
 			}
 		});
     	
@@ -153,7 +178,7 @@ public class MultiColas extends JFrame {
     	setJMenuBar(barra);
     }
     
-    private void crearLogger() {
+    private void crearListener() {
     
          OS.OSEventListener console = new OS.OSEventListener() {
 
@@ -217,12 +242,12 @@ public class MultiColas extends JFrame {
             public void run() {
                 while (true) {
                 	if (running) {
-                		actualizar();
                     	os.execute();
+                    	actualizar();
                 	}
                     
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(MultiColas.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -232,23 +257,29 @@ public class MultiColas extends JFrame {
     }
     
     public void actualizar() {
-        for (PanelProcesador p : procesadores) {
+    	gantt.actualizar();
+    	info.actualizar();
+    	
+    	for (PanelProcesador p : procesadores) {
             p.actualizar();
         }
+    	
+    	revalidate();
     }
     
-    public void addProceso(Process p, int indice) {
-        os.getProcessors().get(indice-1).addProcess(p);
-        
-        System.out.println("proceso agregado");
+    public void addProceso(Process pr, int indice) {
+        os.getProcessors().get(indice-1).addProcess(pr);
+        gantt.agregar(pr.getName());
+        info.addProceso(pr);
     }
     
-    public void addRecurso(String res) {
-        os.addResource(res);
+    public void addRecurso(String re) {
+        os.addResource(re);
+        info.addRecursos(os.getResources().get(re));
     }
     
     public static void main(String[] args) {
-        MultiColas gui = new MultiColas(2);
+        MultiColas gui = new MultiColas(3);
         
         gui.addRecurso("Screen");
         gui.addRecurso("Printer");
@@ -256,20 +287,23 @@ public class MultiColas extends JFrame {
         gui.addRecurso("Mouse");
         
         /* allocate processes for processor one */
-        gui.addProceso(new Process("process1", 5, new String[]{"Printer"}, 1), 1);
+        gui.addProceso(new Process("process1", 100, new String[]{"Printer"}, 1), 1);
 
-        gui.addProceso(new Process("process2", 3, new String[]{"Screen"}, 2), 1);
-        gui.addProceso(new Process("process3", 4, new String[]{"Screen"}, 2), 1);
+        gui.addProceso(new Process("process2", 2, new String[]{"Screen"}, 3), 1);
+        gui.addProceso(new Process("process3", 2, new String[]{"Screen"}, 3), 1);
 
         gui.addProceso(new Process("process4", 2, new String[]{"Screen", "Printer"}, 3), 1);
 
         /* allocate processes for processor two */
-        gui.addProceso(new Process("process5", 5, new String[]{"Screen"}, 1), 2);
+        gui.addProceso(new Process("process5", 100, new String[]{}, 1), 2);
 
-        gui.addProceso(new Process("process6", 3, new String[]{"Printer"}, 2), 2);
+        /*gui.addProceso(new Process("process6", 3, new String[]{"Printer"}, 2), 2);
         gui.addProceso(new Process("process7", 4, new String[]{"Printer"}, 2), 2);
 
-        gui.addProceso(new Process("process8", 2, new String[]{"Screen"}, 3), 2);
+        gui.addProceso(new Process("process8", 2, new String[]{"Screen"}, 3), 2);*/
+        
+        /* allocate processes for processor three */
+        gui.addProceso(new Process("process6", 100, new String[]{}, 1), 3);
         
         gui.actualizar();
         gui.lanzar();
@@ -575,6 +609,129 @@ class DialogoRecurso extends Dialogo {
 		add(crear);
 		
 		return new Dimension(500, 100);
+	}	
+}
+
+class DiagramaGantt extends JFrame {
+	
+	List<Process> procesos;
+	DefaultTableModel modelo;
+	JTable tabla;
+	JScrollPane scroll;
+	
+	public DiagramaGantt(List<Process> procesos) {
+		super("Diagrama Gantt");
+		
+		modelo = new DefaultTableModel();
+		tabla = new JTable(modelo);
+		this.procesos = procesos;
+		
+		scroll = new JScrollPane(tabla);
+		tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		add(scroll);
+		
+		modelo.addColumn("Nombre");
+		
+		setDefaultCloseOperation(HIDE_ON_CLOSE);
+		pack();
 	}
 	
+	private void scrolling() {
+		int columna = tabla.getColumnCount()-1;
+		int fila = tabla.getRowCount()- 1;
+		
+		tabla.scrollRectToVisible(tabla.getCellRect(fila, columna, true));
+		tabla.clearSelection();
+		tabla.setColumnSelectionInterval(columna, columna);
+		modelo.fireTableDataChanged();
+	}
+	
+	public void agregar(String proceso) {
+		modelo.addRow(new String[modelo.getColumnCount()]);
+		modelo.setValueAt(proceso, modelo.getRowCount()-1, 0);
+		
+		scrolling();
+	}
+	
+	public void actualizar() {
+		
+		modelo.addColumn("T " + modelo.getColumnCount());
+		
+		int contador = 0;
+		
+		for (Process pr : procesos) {
+			modelo.setValueAt(pr.getState().toString(), contador, modelo.getColumnCount()-1);
+			contador += 1; 
+		}
+		
+		scrolling();
+	}
+}
+
+class OSInfo extends JPanel {
+	
+	List<Process> procesos;
+	HashMap<String, Resource> recursos;
+	
+	DefaultListModel<String> mProcesos;
+	DefaultListModel<String> mRecursos;
+	
+	public OSInfo(OS os) {
+		super(new GridBagLayout());
+		
+		procesos = os.getProcesses();
+		recursos = os.getResources();
+		
+		mProcesos = new DefaultListModel<>();
+		mRecursos = new DefaultListModel<>();
+		
+		JList lProcesos = new JList(mProcesos);
+		JList lRecursos = new JList(mRecursos);
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.fill = c.HORIZONTAL;
+		
+		c.gridy = 0;
+		c.ipady = 0;
+		add(new JLabel("Procesos"), c);
+		
+		c.gridy = 1;
+		c.ipady = 100;
+		add(new JScrollPane(lProcesos),c);
+		
+		c.gridy = 2;
+		c.ipady = 0;
+		add(new JLabel("Recursos"), c);
+		
+		c.gridy = 3;
+		c.ipady = 100;
+		add(new JScrollPane(lRecursos), c);
+	}
+	
+	public void actualizar() {
+		mProcesos.removeAllElements();
+		mRecursos.removeAllElements();
+		
+		for (Process pr : procesos) {
+			addProceso(pr);
+		}
+		
+		for (Resource re : recursos.values()) {
+			addRecursos(re);
+		}
+		
+		revalidate();
+	}
+	
+	public void addProceso(Process pr) {
+		mProcesos.addElement("N:  "+pr.getName() + "    T:  " + pr.getTime() + "    S:  " + pr.getState());
+	}
+	
+	public void addRecursos(Resource re) {
+		Process pr = re.getProcess();
+		String proceso = pr == null ? "-----" : pr.getName();
+		
+		mRecursos.addElement("N:  "+re.getName() + "       P: " + proceso);
+	}
 }
