@@ -131,6 +131,10 @@ public class Process {
 		return priority;
 	}
 	
+	public State getState() {
+		return state;
+	}
+	
 	public List<String> getResources() {
 		return resources;
 	}

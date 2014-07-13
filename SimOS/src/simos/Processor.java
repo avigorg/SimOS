@@ -19,6 +19,7 @@ public class Processor {
 	public void addProcess(Process pr) {
 		pr.os = os;
 		planner.toReady(pr);
+		os.addProcess(pr);
 	}
 	
 	public void plan() {

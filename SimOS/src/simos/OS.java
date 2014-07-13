@@ -8,6 +8,7 @@ import java.util.List;
 public class OS {
 
 	List<Processor> processors;
+	List<Process> processes;
 	HashMap<String, Resource> resources;
 	
 	List<OSEventListener> listeners;
@@ -17,6 +18,7 @@ public class OS {
 	public OS(OSDecider decider) {
 		
 		processors = new ArrayList<>();
+		processes = new LinkedList<>();
 		resources = new HashMap<>();
 		listeners = new LinkedList<>(); 
 		
@@ -173,6 +175,10 @@ public class OS {
 		}
 	}
 	
+	public void addProcess(Process p) {
+		processes.add(p);
+	}
+	
 	public void addProcessor(Processor p) {
 		processors.add(p);
 		p.os = this;
@@ -180,6 +186,10 @@ public class OS {
 	
 	public void addListener(OSEventListener listener) {
 		listeners.add(listener);
+	}
+	
+	public List<Process> getProcesses() {
+		return processes;
 	}
 	
 	public List<Processor> getProcessors() {

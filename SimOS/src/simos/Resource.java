@@ -68,6 +68,10 @@ public class Resource {
 		return name;
 	}
 	
+	public Process getProcess() {
+		return process;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("n: %s s: %s pr: %s", name, state, process != null ? process.name : "None");
